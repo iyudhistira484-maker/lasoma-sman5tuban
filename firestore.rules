@@ -1,0 +1,36 @@
+rules_version = '2';
+
+// Firestore rules untuk koleksi `comments` di project Firebase Lasoma.
+// Catatan: project ini tidak pakai Firebase Auth, jadi "kepemilikan" komentar
+// dipegang oleh field `ownerId` (UUID per-browser yang disimpan di localStorage).
+// Validasi kepemilikan utama dilakukan di sisi UI (tombol hapus hanya muncul
+// untuk komentar yang ownerId-nya sama dengan clientId di browser).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /comments/{commentId} {
+      // Semua orang boleh baca komentar.
+      allow read: if true;
+
+      // Buat komentar: wajib ada name, message, ownerId, dan createdAt server.
+      allow create: if
+        request.resource.data.keys().hasOnly(['name', 'message', 'ownerId', 'createdAt']) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() >= 2 &&
+        request.resource.data.name.size() <= 60 &&
+        request.resource.data.message is string &&
+        request.resource.data.message.size() >= 3 &&
+        request.resource.data.message.size() <= 1000 &&
+        request.resource.data.ownerId is string &&
+        request.resource.data.ownerId.size() >= 8 &&
+        request.resource.data.ownerId.size() <= 64 &&
+        request.resource.data.createdAt == request.time;
+
+      // Tidak ada update dari client.
+      allow update: if false;
+
+      // Delete diizinkan dari client (UI gating: hanya pemilik yang melihat
+      // tombol hapus). Tanpa Firebase Auth tidak bisa diverifikasi di server.
+      allow delete: if true;
+    }
+  }
+}
