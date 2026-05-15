@@ -380,7 +380,7 @@ const osisStructure = {
       description:
         "Membantu pengelolaan administrasi, pendataan kegiatan, dan koordinasi kebutuhan dokumen OSIS.",
       photo:
-        "https://i.ibb.co.com/yc40DYY8/DSC0531.webp"
+        "https://i.ibb.co.com/4gdBRvvN/IMG-20260515-WA0029.webp"
     },
     {
       name: "Cantika Eka Safira",
